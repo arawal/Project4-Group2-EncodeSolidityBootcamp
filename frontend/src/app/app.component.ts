@@ -4,6 +4,20 @@ import { ethers } from 'ethers';
 import tokenJson from '../assets/MyToken.json'
 
 const TOKEN_CONTRACT_ADDRESS = "0x284a7042be8749c1b3a35509f27ebb09c2737956";
+const BALLOT_CONTRACT_ADDRESS = "0xEe69666C8670D4C1C632D1d34eba1b803C218479"
+
+// the below format is the same as the claimTokensDTO
+/**
+ export class claimTokensDTO {
+  address: string;
+  constructor(address: string) {
+      this.address = address;
+    }
+  }
+ */
+export class claimTokensDTO {
+  constructor(public address: string) {}
+}
 
 @Component({
   selector: 'app-root',
@@ -50,7 +64,7 @@ export class AppComponent {
 
 
     this.backendUrl = "http://localhost:3000"
-    this.http.get<any>(`${this.backendUrl}/get-token-contract-address`).subscribe((ans) => {
+    this.http.get<any>(`${this.backendUrl}/token-address`).subscribe((ans) => {
       this.tokenContractAddress = ans.result;
     })
     this.tokenRequestPending = false;
@@ -105,8 +119,17 @@ export class AppComponent {
     this.ballotContractAddress = address;
   }
 
-  requestTokensTen() {
+  requestTokensHundred() {
     // TODO: request 10 tokens to be minted in the backend
+    const body = new claimTokensDTO(this.wallet?.address ?? '');
+    this.http.post<any>(`${this.backendUrl}/claim-tokens`, body).subscribe((ans) => {
+      const txHash = ans.result;
+      // const tx = this.provider.getTransaction(txHash);
+      // tx.wait()
+      // after tx confirms, call updateValues(), or display more things on the page
+      console.log(ans);
+    })
+
     this.tokenRequestPending = true;
   }
 
